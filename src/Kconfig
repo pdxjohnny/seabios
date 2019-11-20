@@ -41,6 +41,14 @@ endchoice
         help
             Configure to be used by xen hvmloader, for a HVM guest.
 
+    config KVM
+        depends on QEMU
+        bool "Support KVM paravitalization"
+        default y
+        help
+	    Configure to support KVM paravitalization and KVM based hardening
+	    features for the guest VM.
+
     config THREADS
         bool "Parallelize hardware init"
         default y

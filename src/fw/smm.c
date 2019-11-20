@@ -18,6 +18,7 @@
 #include "string.h" // memcpy
 #include "util.h" // smm_setup
 #include "x86.h" // wbinvd
+#include "kvm.h" // _kvm_hypercall2
 
 /*
  * Check SMM state save area format (bits 0-15) and require support
@@ -79,6 +80,13 @@ handle_smi(u16 cs)
             warn_internalerror();
             return;
         }
+
+	if (kvm_features() & KVM_FEATURE_HARDEN) {
+		// indicate to kvm we know how to help with hardening
+		long results = _kvm_hypercall2(long, KVM_HC_HARDEN, KVM_HC_HARDEN_SMM_INIT, SMM_FEATURE_INIT);
+		dprintf(1, "\nkvm_hc_harden: %ld\n", results);
+	}
+
         // indicate to smm_relocate_and_restore() that the SMM code was executed
         outb(0x00, PORT_SMI_STATUS);
 
